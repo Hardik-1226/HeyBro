@@ -2,3 +2,4 @@ fastapi
 uvicorn
 mediapipe
 tensorflow
+cvzone
