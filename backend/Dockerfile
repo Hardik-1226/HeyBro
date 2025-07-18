@@ -4,6 +4,8 @@ FROM python:3.9-slim
 # Prevent Python from writing .pyc files and buffer issues
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+# Suppress TensorFlow INFO and WARNING logs
+ENV TF_CPP_MIN_LOG_LEVEL=2
 
 # Set work directory
 WORKDIR /app
