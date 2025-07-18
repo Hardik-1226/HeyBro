@@ -43,5 +43,5 @@ USER appuser
 # Expose the port
 EXPOSE 8000
 
-# Run the app with xvfb-run for GUI support
-CMD ["xvfb-run", "-a", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the app with xvfb-run for GUI support, using PORT env variable for Render compatibility
+CMD ["sh", "-c", "xvfb-run -a uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
