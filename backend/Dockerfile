@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libx11-6 \
     scrot \
     xvfb \
+    xauth \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
