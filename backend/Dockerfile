@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrender1 \
     libx11-6 \
     scrot \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
@@ -41,5 +42,5 @@ USER appuser
 # Expose the port
 EXPOSE 8000
 
-# Run the app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the app with xvfb-run for GUI support
+CMD ["xvfb-run", "-a", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
