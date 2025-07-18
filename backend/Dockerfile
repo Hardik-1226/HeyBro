@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies needed by mediapipe, Pillow, TensorFlow, etc.
+# Install system dependencies needed by mediapipe, Pillow, TensorFlow, opencv-python, pyautogui, etc.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libgl1-mesa-glx \
@@ -17,6 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libsm6 \
     libxext6 \
     libxrender1 \
+    libx11-6 \
+    scrot \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies

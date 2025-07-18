@@ -3,3 +3,5 @@ uvicorn
 mediapipe
 tensorflow
 cvzone
+pyautogui
+opencv-python
