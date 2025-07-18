@@ -1,5 +1,5 @@
 # Use official Python image
-FROM python:3.11
+FROM python:3.9-slim-buster
 
 # Prevent Python from writing .pyc files and buffer issues
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -8,23 +8,33 @@ ENV PYTHONUNBUFFERED=1
 # Set work directory
 WORKDIR /app
 
-# Install system dependencies needed by Pillow, TensorFlow, etc.
-RUN apt-get update && apt-get install -y \
+# Install system dependencies needed by mediapipe, Pillow, TensorFlow, etc.
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libgl1-mesa-glx \
     libglib2.0-0 \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
 
-# Upgrade pip and install manually tensorflow first
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir tensorflow \
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install dependencies (TensorFlow, mediapipe, etc. first if needed)
+RUN pip install --no-cache-dir tensorflow mediapipe \
     && pip install --no-cache-dir -r requirements.txt
 
 # Copy the app code
 COPY . .
+
+# (Optional) Create a non-root user and switch to it
+RUN useradd -m appuser && chown -R appuser /app
+USER appuser
 
 # Expose the port
 EXPOSE 8000
