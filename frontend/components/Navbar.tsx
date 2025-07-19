@@ -27,14 +27,8 @@ export default function Navbar() {
           <Button
             variant="ghost"
             className="text-white hover:text-neon-blue dark:text-white dark:hover:text-neon-blue light:text-gray-800 light:hover:text-peach-500"
-          >
-            Features
-          </Button>
-        </Link>
-        <Link href="/#about" passHref>
-          <Button
-            variant="ghost"
-            className="text-white hover:text-neon-blue dark:text-white dark:hover:text-neon-blue light:text-gray-800 light:hover:text-peach-500"
+          
+           
           >
             About
           </Button>
