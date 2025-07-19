@@ -23,32 +23,28 @@ const COOLDOWNS = {
   zoom: 800,
 };
 
-export function GestureToggleButton({ enabled, setEnabled }: { enabled: boolean, setEnabled: React.Dispatch<React.SetStateAction<boolean>> }) {
-  return (
-    <button
-      onClick={() => setEnabled((prev: boolean) => !prev)}
-      style={{
-        position: 'fixed', bottom: 32, left: 32, zIndex: 10001,
-        background: enabled ? '#8A2BE2' : '#444', color: '#fff', border: 'none', borderRadius: 50, width: 56, height: 56,
-        fontWeight: 'bold', fontSize: 28, boxShadow: '0 2px 12px #0008', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}
-      title={enabled ? 'Disable Gesture Control' : 'Enable Gesture Control'}
-    >
-      <span role="img" aria-label="hand">🖐️</span>
-    </button>
-  );
-}
-
-// New default export: manages state and renders both toggle and detector
-export default function GestureControlClient() {
+export function GestureToggleButton() {
   const [enabled, setEnabled] = React.useState(false);
   return (
     <>
-      <GestureToggleButton enabled={enabled} setEnabled={setEnabled} />
-      <GestureDetector enabled={enabled} />
+      <button
+        onClick={() => setEnabled((prev) => !prev)}
+        style={{
+          position: 'fixed', bottom: 32, left: 32, zIndex: 10001,
+          background: enabled ? '#8A2BE2' : '#444', color: '#fff', border: 'none', borderRadius: 50, width: 56, height: 56,
+          fontWeight: 'bold', fontSize: 28, boxShadow: '0 2px 12px #0008', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}
+        title={enabled ? 'Disable Gesture Control' : 'Enable Gesture Control'}
+      >
+        <span role="img" aria-label="hand">🖐️</span>
+      </button>
+      {enabled && <GestureDetector enabled={true} />}
     </>
   );
 }
+
+// New default export: just re-export GestureToggleButton
+export default GestureToggleButton;
 
 export function GestureDetector({ enabled, showInstructions }: { enabled: boolean, showInstructions?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
