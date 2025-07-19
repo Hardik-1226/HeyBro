@@ -39,7 +39,12 @@ export function GestureToggleButton({ enabled, setEnabled }: { enabled: boolean,
   );
 }
 
-export default function GestureDetector({ enabled, showInstructions }: { enabled: boolean, showInstructions?: boolean }) {
+export default function GestureToggleButtonClient() {
+  const [enabled, setEnabled] = React.useState(false);
+  return <GestureToggleButton enabled={enabled} setEnabled={setEnabled} />;
+}
+
+export function GestureDetector({ enabled, showInstructions }: { enabled: boolean, showInstructions?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastScrollY = useRef<number | null>(null);
   const lastPinch = useRef<boolean>(false);
