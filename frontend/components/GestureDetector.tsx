@@ -172,7 +172,7 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
   return (
     <>
       <div>
-        <video ref={videoRef} style={{ display: "block", width: 640, height: 480, position: 'fixed', top: 24, right: 24, zIndex: 9999, borderRadius: 12, boxShadow: '0 2px 12px #0008' }} autoPlay playsInline />
+        <video ref={videoRef} style={{ display: "none" }} autoPlay playsInline />
         {/* Custom cursor for gesture control */}
         <div id="gesture-cursor" style={{
           position: "fixed",
