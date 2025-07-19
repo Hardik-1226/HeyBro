@@ -6,6 +6,7 @@ import { BACKEND_URL } from "@/lib/api";
 
 export default function GestureDetector() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const lastSentRef = useRef<number>(0);
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -22,16 +23,26 @@ export default function GestureDetector() {
     });
 
     hands.onResults(async (results: any) => {
-      // Here you get hand landmarks and can trigger actions!
-      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        // Send landmarks to backend
-        await fetch(`${BACKEND_URL}/process-landmarks`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ landmarks: results.multiHandLandmarks }),
-        });
+      const now = Date.now();
+      // Send at most every 200ms
+      if (
+        results.multiHandLandmarks &&
+        results.multiHandLandmarks.length > 0 &&
+        now - lastSentRef.current > 200
+      ) {
+        lastSentRef.current = now;
+        try {
+          const response = await fetch(`${BACKEND_URL}/process-landmarks`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ landmarks: results.multiHandLandmarks }),
+          });
+          // Optionally, handle backend response here
+          // const data = await response.json();
+        } catch (err) {
+          // Optionally, handle error
+        }
       }
-      console.log(results.multiHandLandmarks);
     });
 
     const camera = new Camera(videoRef.current, {

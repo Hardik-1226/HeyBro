@@ -160,10 +160,20 @@ def stop_gesture():
 def read_root():
     return {"message": "GestureGuy backend is running!"}
 
+def recognize_gesture(landmarks):
+    # Example: simple logic, you can expand this!
+    if not landmarks or not isinstance(landmarks, list):
+        return "no_hand"
+    # Example: check if index finger tip is above middle finger tip
+    hand = landmarks[0]
+    if hand[8][1] < hand[12][1]:
+        return "index_above_middle"
+    return "unknown"
+
 @app.post("/process-landmarks")
 async def process_landmarks(request: Request):
     data = await request.json()
     landmarks = data.get("landmarks")
-    # You can now process the landmarks as needed
-    print("Received landmarks:", landmarks)
-    return {"status": "received", "num_hands": len(landmarks) if landmarks else 0}
+    action = recognize_gesture(landmarks)
+    # You can add more logic here (e.g., trigger something, log, etc.)
+    return {"status": "received", "action": action}
