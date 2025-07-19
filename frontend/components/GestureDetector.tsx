@@ -2,6 +2,7 @@
 import React, { useRef, useEffect } from "react";
 import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
+import { BACKEND_URL } from "@/lib/api";
 
 export default function GestureDetector() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -24,7 +25,7 @@ export default function GestureDetector() {
       // Here you get hand landmarks and can trigger actions!
       if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
         // Send landmarks to backend
-        await fetch("https://heybro-2.onrender.com/process-landmarks", {
+        await fetch(`${BACKEND_URL}/process-landmarks`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ landmarks: results.multiHandLandmarks }),

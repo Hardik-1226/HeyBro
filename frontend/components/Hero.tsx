@@ -5,14 +5,12 @@ import { SparklesIcon, RocketIcon, LightbulbIcon } from "lucide-react"
 import TypewriterEffect from "./TypewriterEffect"
 import Link from "next/link"
 import { useState } from "react"
+import { BACKEND_URL } from "@/lib/api";
 
 export default function Hero() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [activated, setActivated] = useState(false)
-
-  // Use production backend
-  const BACKEND_URL = "https://heybro-2.onrender.com";
 
   const handleGetStarted = async () => {
     setLoading(true)

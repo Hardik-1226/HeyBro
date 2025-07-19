@@ -1,9 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { SparklesIcon, RocketIcon, LightbulbIcon } from "lucide-react"
 import React, { useState } from "react"
-
-// Use production backend URL for deployment
-const BACKEND_URL = "https://heybro-2.onrender.com"
+import { BACKEND_URL } from "@/lib/api";
 
 export default function HeroSection() {
   const [loading, setLoading] = useState(false)
