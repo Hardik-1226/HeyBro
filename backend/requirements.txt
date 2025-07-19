@@ -1,6 +1,5 @@
 fastapi
 uvicorn
-tensorflow
 cvzone
 pyautogui
-# opencv-python and mediapipe removed as they are no longer needed
+# tensorflow removed as it is no longer needed
