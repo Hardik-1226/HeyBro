@@ -43,12 +43,17 @@ export default function Demo() {
           </span>{" "}
           the Innovators
         </h3>
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-8">
           {[
             {
               name: "Hardik Varshney",
               bio: "Creator and lead developer of GestureGuy.",
               avatar: "/hardik-innovator.jpg", // Use the uploaded image
+            },
+            {
+              name: "Insha Naaz",
+              bio: "Co-innovator and creative contributor.",
+              avatar: "/insha-innovator.jpg", // Add the image to your public folder
             },
           ].map((person, index) => (
             <div

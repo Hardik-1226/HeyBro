@@ -110,8 +110,8 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
             // Single click
             setLastGesture("Click");
             const el = document.elementFromPoint(cursorPos.current.x, cursorPos.current.y) as HTMLElement | null;
-            if (el && el.tagName !== "A" && el.tagName !== "BUTTON") {
-              el.click();
+            if (el && el.tagName !== "A") {
+              el.dispatchEvent(new MouseEvent("click", { bubbles: true, clientX: cursorPos.current.x, clientY: cursorPos.current.y }));
             }
             lastClickTime.current = now;
             lastDoubleClickTime.current = now;
