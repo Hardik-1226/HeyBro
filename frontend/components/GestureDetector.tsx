@@ -28,7 +28,7 @@ export function GestureToggleButton({ enabled, setEnabled }: { enabled: boolean,
     <button
       onClick={() => setEnabled((prev: boolean) => !prev)}
       style={{
-        position: 'fixed', bottom: 32, right: 32, zIndex: 10001,
+        position: 'fixed', bottom: 32, left: 32, zIndex: 10001,
         background: enabled ? '#8A2BE2' : '#444', color: '#fff', border: 'none', borderRadius: 50, width: 56, height: 56,
         fontWeight: 'bold', fontSize: 28, boxShadow: '0 2px 12px #0008', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
@@ -39,9 +39,15 @@ export function GestureToggleButton({ enabled, setEnabled }: { enabled: boolean,
   );
 }
 
-export default function GestureToggleButtonClient() {
+// New default export: manages state and renders both toggle and detector
+export default function GestureControlClient() {
   const [enabled, setEnabled] = React.useState(false);
-  return <GestureToggleButton enabled={enabled} setEnabled={setEnabled} />;
+  return (
+    <>
+      <GestureToggleButton enabled={enabled} setEnabled={setEnabled} />
+      <GestureDetector enabled={enabled} />
+    </>
+  );
 }
 
 export function GestureDetector({ enabled, showInstructions }: { enabled: boolean, showInstructions?: boolean }) {
