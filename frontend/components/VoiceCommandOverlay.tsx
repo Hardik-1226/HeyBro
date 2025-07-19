@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { triggerVirtualKey } from "./VirtualKeyboard";
 
 const COMMANDS = [
   { keywords: ["up", "scroll up"], action: () => window.scrollBy({ top: -200, behavior: "smooth" }) },
@@ -19,6 +20,14 @@ const COMMANDS = [
   } },
 ];
 
+function typeText(text: string) {
+  for (const char of text) {
+    if (char === " ") triggerVirtualKey("Space");
+    else if (/^[a-zA-Z]$/.test(char)) triggerVirtualKey(char.toUpperCase());
+    // Add more as needed
+  }
+}
+
 export default function VoiceCommandOverlay() {
   const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -34,14 +43,24 @@ export default function VoiceCommandOverlay() {
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.continuous = true;
-    recognition.interimResults = false;
+    recognition.interimResults = true; // Use interim results for more sensitivity
     recognition.onresult = (event: any) => {
-      const last = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-      setTranscript(last);
-      for (const cmd of COMMANDS) {
-        if (cmd.keywords.some(k => last.includes(k))) {
-          cmd.action();
-          setTranscript(`✔️ ${last}`);
+      let last = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        last = event.results[i][0].transcript.trim().toLowerCase();
+        setTranscript(last);
+        // Typing feature: "type hello world"
+        if (last.startsWith("type ")) {
+          const toType = last.replace("type ", "");
+          typeText(toType);
+          setTranscript(`✔️ Typed: ${toType}`);
+          continue;
+        }
+        for (const cmd of COMMANDS) {
+          if (cmd.keywords.some(k => last.includes(k))) {
+            cmd.action();
+            setTranscript(`✔️ ${last}`);
+          }
         }
       }
     };
@@ -79,7 +98,7 @@ export default function VoiceCommandOverlay() {
         {listening ? 'Stop Listening' : 'Start Listening'}
       </button>
       <div style={{ fontSize: 16, marginTop: 8, color: listening ? '#8A2BE2' : '#aaa', minHeight: 24 }}>
-        {transcript || '(Say: up, down, click, scroll up, zoom in, zoom out...)'}
+        {transcript || '(Say: up, down, click, scroll up, zoom in, zoom out, type hello...)'}
       </div>
     </div>
   );

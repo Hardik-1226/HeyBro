@@ -63,6 +63,7 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
     if (!enabled || !videoRef.current) return;
 
     let camera: Camera;
+    let stream: MediaStream | null = null;
     const hands = new Hands({
       locateFile: (file: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
     });
@@ -162,8 +163,17 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
     });
     camera.start();
 
+    // Save the stream for cleanup
+    stream = videoRef.current.srcObject as MediaStream | null;
+
     return () => {
       camera && camera.stop();
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
     };
   }, [enabled]);
 

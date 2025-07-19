@@ -23,12 +23,13 @@ function sendKey(key: string, input: HTMLInputElement | HTMLTextAreaElement | nu
   input.focus();
 }
 
-// Expose for gesture integration
+// Expose for gesture/voice integration
 export let triggerVirtualKey: (key: string) => void = () => {};
 
 export default function VirtualKeyboard() {
   const [lastKey, setLastKey] = useState<string | null>(null);
   const lastInputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
+  const fallbackInputRef = useRef<HTMLInputElement>(null);
 
   // Track last focused input
   React.useEffect(() => {
@@ -41,10 +42,16 @@ export default function VirtualKeyboard() {
     return () => window.removeEventListener("focusin", handler);
   }, []);
 
-  // Expose trigger for gesture integration
+  // Expose trigger for gesture/voice integration
   triggerVirtualKey = (key: string) => {
     setLastKey(key);
-    sendKey(key === "Space" ? " " : key, lastInputRef.current);
+    let input = lastInputRef.current;
+    if (!input) {
+      // Fallback: focus the hidden input
+      fallbackInputRef.current?.focus();
+      input = fallbackInputRef.current;
+    }
+    sendKey(key === "Space" ? " " : key, input);
     setTimeout(() => setLastKey(null), 200);
   };
 
@@ -66,6 +73,8 @@ export default function VirtualKeyboard() {
       maxWidth: "90vw",
       opacity: 0.98,
     }}>
+      {/* Hidden fallback input for demo typing */}
+      <input ref={fallbackInputRef} style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', width: 1, height: 1, left: 0, top: 0 }} tabIndex={-1} />
       {KEYS.map((row, i) => (
         <div key={i} style={{ display: "flex", gap: 8, justifyContent: "center" }}>
           {row.map((key) => (
@@ -73,7 +82,12 @@ export default function VirtualKeyboard() {
               key={key}
               onClick={() => {
                 setLastKey(key);
-                sendKey(key === "Space" ? " " : key, lastInputRef.current);
+                let input = lastInputRef.current;
+                if (!input) {
+                  fallbackInputRef.current?.focus();
+                  input = fallbackInputRef.current;
+                }
+                sendKey(key === "Space" ? " " : key, input);
                 setTimeout(() => setLastKey(null), 200);
               }}
               style={{
