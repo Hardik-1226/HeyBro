@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Hands } from "@mediapipe/hands";
 import { Camera } from "@mediapipe/camera_utils";
 import { BACKEND_URL } from "@/lib/api";
@@ -7,6 +7,7 @@ import { BACKEND_URL } from "@/lib/api";
 export default function GestureDetector() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastSentRef = useRef<number>(0);
+  const [action, setAction] = useState<string>("");
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -37,8 +38,8 @@ export default function GestureDetector() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ landmarks: results.multiHandLandmarks }),
           });
-          // Optionally, handle backend response here
-          // const data = await response.json();
+          const data = await response.json();
+          setAction(data.action || "");
         } catch (err) {
           // Optionally, handle error
         }
@@ -64,6 +65,9 @@ export default function GestureDetector() {
   return (
     <div>
       <video ref={videoRef} style={{ display: "block", width: 640, height: 480 }} autoPlay playsInline />
+      <div style={{ marginTop: 16, fontSize: 20, color: '#8A2BE2', fontWeight: 'bold' }}>
+        {action && `Detected Action: ${action}`}
+      </div>
     </div>
   );
 } 
