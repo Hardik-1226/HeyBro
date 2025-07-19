@@ -6,6 +6,7 @@ import TypewriterEffect from "./TypewriterEffect"
 import Link from "next/link"
 import { useState } from "react"
 import { BACKEND_URL } from "@/lib/api";
+import GestureToggleButton from "@/components/GestureDetector";
 
 export default function Hero() {
   const [loading, setLoading] = useState(false)
@@ -58,6 +59,8 @@ export default function Hero() {
 
   return (
     <section className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 py-12 dark:bg-black/50 light:bg-transparent pt-24">
+      {/* Camera overlay and gesture toggle button */}
+      <GestureToggleButton />
       <h1 className="text-5xl md:text-7xl font-extrabold text-white leading-tight mb-6 dark:text-white light:text-gray-800">
         <TypewriterEffect
           text="GestureGuy"

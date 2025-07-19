@@ -99,8 +99,9 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
             // Double click
             if (now - lastClickTime.current > COOLDOWNS.doubleClick) {
               setLastGesture("Double Click");
+              // Prevent navigation: only dispatch event if element is not a link
               const el = document.elementFromPoint(cursorPos.current.x, cursorPos.current.y) as HTMLElement | null;
-              if (el) {
+              if (el && el.tagName !== "A" && el.tagName !== "BUTTON") {
                 el.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, clientX: cursorPos.current.x, clientY: cursorPos.current.y }));
               }
               lastClickTime.current = now;
@@ -109,7 +110,7 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
             // Single click
             setLastGesture("Click");
             const el = document.elementFromPoint(cursorPos.current.x, cursorPos.current.y) as HTMLElement | null;
-            if (el) {
+            if (el && el.tagName !== "A" && el.tagName !== "BUTTON") {
               el.click();
             }
             lastClickTime.current = now;
@@ -117,17 +118,20 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
           }
         }
         lastPinch.current = isPinching;
-        // Scroll (swipe up/down with middle finger)
-        if (lastScrollY.current !== null) {
-          const deltaY = hand[12].y - lastScrollY.current;
-          if (Math.abs(deltaY) > 0.04 && now - lastScrollTime.current > COOLDOWNS.scroll) {
-            setLastGesture(deltaY > 0 ? "Scroll Down" : "Scroll Up");
-            window.scrollBy({ top: deltaY * 500, behavior: "smooth" });
-            lastScrollTime.current = now;
-          }
+        // Thumbs up/down for scroll
+        // Thumb: 4, Index: 8, Middle: 12, Ring: 16, Pinky: 20
+        const isThumbUp = hand[4].y < hand[3].y && hand[4].y < hand[8].y && hand[4].y < hand[12].y && hand[4].y < hand[16].y && hand[4].y < hand[20].y;
+        const isThumbDown = hand[4].y > hand[3].y && hand[4].y > hand[8].y && hand[4].y > hand[12].y && hand[4].y > hand[16].y && hand[4].y > hand[20].y;
+        if (isThumbUp && now - lastScrollTime.current > COOLDOWNS.scroll) {
+          setLastGesture("Scroll Up");
+          window.scrollBy({ top: -200, behavior: "smooth" });
+          lastScrollTime.current = now;
+        } else if (isThumbDown && now - lastScrollTime.current > COOLDOWNS.scroll) {
+          setLastGesture("Scroll Down");
+          window.scrollBy({ top: 200, behavior: "smooth" });
+          lastScrollTime.current = now;
         }
-        lastScrollY.current = hand[12].y;
-        // Zoom in (spread thumb & pinky)
+        // Optimized zoom: only trigger once per gesture
         const zoomInDist = Math.hypot(hand[4].x - hand[20].x, hand[4].y - hand[20].y);
         const isZoomIn = zoomInDist > 0.35;
         if (isZoomIn && !lastZoomIn.current && now - lastZoomTime.current > COOLDOWNS.zoom) {
@@ -136,7 +140,6 @@ export function GestureDetector({ enabled, showInstructions }: { enabled: boolea
           lastZoomTime.current = now;
         }
         lastZoomIn.current = isZoomIn;
-        // Zoom out (pinch thumb & middle)
         const zoomOutDist = Math.hypot(hand[4].x - hand[12].x, hand[4].y - hand[12].y);
         const isZoomOut = zoomOutDist < 0.05;
         if (isZoomOut && !lastZoomOut.current && now - lastZoomTime.current > COOLDOWNS.zoom) {
