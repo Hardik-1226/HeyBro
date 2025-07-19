@@ -30,6 +30,10 @@ def dist(p1, p2):
 def run_gesture_control():
     screen_width, screen_height = pyautogui.size()
     cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("No camera found. Gesture control is disabled.")
+        gesture_running.clear()
+        return  # Exit gracefully if no camera
     detector = HandDetector(detectionCon=0.8, maxHands=1)
 
     last_action_time = 0
@@ -130,6 +134,11 @@ def run_gesture_control():
 @app.post("/get-started")
 def start_gesture():
     global gesture_thread
+    # Try to open camera
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        return JSONResponse(content={"status": "no_camera", "message": "No camera found. Gesture control is disabled."})
+    cap.release()
     if gesture_running.is_set():
         return JSONResponse(content={"status": "already_running"})
     gesture_running.set()
