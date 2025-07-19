@@ -6,6 +6,7 @@ import cv2
 from cvzone.HandTrackingModule import HandDetector
 import pyautogui
 import time
+from fastapi import Request
 
 # FastAPI Setup
 app = FastAPI()
@@ -158,3 +159,11 @@ def stop_gesture():
 @app.get("/")
 def read_root():
     return {"message": "GestureGuy backend is running!"}
+
+@app.post("/process-landmarks")
+async def process_landmarks(request: Request):
+    data = await request.json()
+    landmarks = data.get("landmarks")
+    # You can now process the landmarks as needed
+    print("Received landmarks:", landmarks)
+    return {"status": "received", "num_hands": len(landmarks) if landmarks else 0}
