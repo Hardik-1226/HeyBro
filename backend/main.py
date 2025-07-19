@@ -144,3 +144,8 @@ def stop_gesture():
         return JSONResponse(content={"status": "not_running"})
     gesture_running.clear()
     return JSONResponse(content={"status": "stopped"})
+
+# Root Endpoint
+@app.get("/")
+def read_root():
+    return {"message": "GestureGuy backend is running!"}
