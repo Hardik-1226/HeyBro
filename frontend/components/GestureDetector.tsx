@@ -195,8 +195,9 @@ export default function GestureDetector({ enabled, showInstructions }: { enabled
       )}
     </>
   );
-} / /  
+}/ /  
  t e s t :  
+ n e w  
  f o r c e  
  a  
  v i s i b l e  
