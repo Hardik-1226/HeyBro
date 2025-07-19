@@ -16,6 +16,13 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+const COOLDOWNS = {
+  click: 500,
+  doubleClick: 700,
+  scroll: 400,
+  zoom: 800,
+};
+
 export default function GestureDetector() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastScrollY = useRef<number | null>(null);
@@ -23,6 +30,9 @@ export default function GestureDetector() {
   const lastZoomIn = useRef<boolean>(false);
   const lastZoomOut = useRef<boolean>(false);
   const lastClickTime = useRef<number>(0);
+  const lastDoubleClickTime = useRef<number>(0);
+  const lastScrollTime = useRef<number>(0);
+  const lastZoomTime = useRef<number>(0);
   const [lastGesture, setLastGesture] = useState<string>("");
   const [enabled, setEnabled] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
@@ -50,28 +60,31 @@ export default function GestureDetector() {
           (1 - hand[8].x) * window.innerWidth,
           hand[8].y * window.innerHeight,
         ];
-        // Smooth cursor
-        cursorPos.current.x = lerp(cursorPos.current.x, targetX, 0.3);
-        cursorPos.current.y = lerp(cursorPos.current.y, targetY, 0.3);
+        // Clamp cursor to viewport
+        const clamp = (val: number, min: number, max: number) => Math.max(min, Math.min(max, val));
+        cursorPos.current.x = lerp(cursorPos.current.x, clamp(targetX, 0, window.innerWidth), 0.3);
+        cursorPos.current.y = lerp(cursorPos.current.y, clamp(targetY, 0, window.innerHeight), 0.3);
         const cursor = document.getElementById("gesture-cursor");
         if (cursor) {
           cursor.style.left = `${cursorPos.current.x - 10}px`;
           cursor.style.top = `${cursorPos.current.y - 10}px`;
         }
-        // Pinch (index tip near thumb tip) for click
+        // Pinch (index tip near thumb tip) for click/double click
         const pinchDist = Math.hypot(hand[8].x - hand[4].x, hand[8].y - hand[4].y);
         const isPinching = pinchDist < 0.05;
         const now = Date.now();
         if (isPinching && !lastPinch.current) {
-          if (now - lastClickTime.current < 400) {
+          if (now - lastDoubleClickTime.current < COOLDOWNS.doubleClick) {
             // Double click
-            setLastGesture("Double Click");
-            const el = document.elementFromPoint(cursorPos.current.x, cursorPos.current.y) as HTMLElement | null;
-            if (el) {
-              el.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, clientX: cursorPos.current.x, clientY: cursorPos.current.y }));
+            if (now - lastClickTime.current > COOLDOWNS.doubleClick) {
+              setLastGesture("Double Click");
+              const el = document.elementFromPoint(cursorPos.current.x, cursorPos.current.y) as HTMLElement | null;
+              if (el) {
+                el.dispatchEvent(new MouseEvent("dblclick", { bubbles: true, clientX: cursorPos.current.x, clientY: cursorPos.current.y }));
+              }
+              lastClickTime.current = now;
             }
-            lastClickTime.current = 0; // reset
-          } else {
+          } else if (now - lastClickTime.current > COOLDOWNS.click) {
             // Single click
             setLastGesture("Click");
             const el = document.elementFromPoint(cursorPos.current.x, cursorPos.current.y) as HTMLElement | null;
@@ -79,32 +92,36 @@ export default function GestureDetector() {
               el.click();
             }
             lastClickTime.current = now;
+            lastDoubleClickTime.current = now;
           }
         }
         lastPinch.current = isPinching;
-        // Swipe up/down for scroll (middle finger tip y movement)
+        // Scroll (swipe up/down with middle finger)
         if (lastScrollY.current !== null) {
           const deltaY = hand[12].y - lastScrollY.current;
-          if (Math.abs(deltaY) > 0.02) {
+          if (Math.abs(deltaY) > 0.04 && now - lastScrollTime.current > COOLDOWNS.scroll) {
             setLastGesture(deltaY > 0 ? "Scroll Down" : "Scroll Up");
             window.scrollBy({ top: deltaY * 500, behavior: "smooth" });
+            lastScrollTime.current = now;
           }
         }
         lastScrollY.current = hand[12].y;
         // Zoom in (spread thumb & pinky)
         const zoomInDist = Math.hypot(hand[4].x - hand[20].x, hand[4].y - hand[20].y);
         const isZoomIn = zoomInDist > 0.35;
-        if (isZoomIn && !lastZoomIn.current) {
+        if (isZoomIn && !lastZoomIn.current && now - lastZoomTime.current > COOLDOWNS.zoom) {
           setLastGesture("Zoom In");
           document.body.style.zoom = `${Math.min((Number(document.body.style.zoom) || 1) + 0.1, 2)}`;
+          lastZoomTime.current = now;
         }
         lastZoomIn.current = isZoomIn;
         // Zoom out (pinch thumb & middle)
         const zoomOutDist = Math.hypot(hand[4].x - hand[12].x, hand[4].y - hand[12].y);
         const isZoomOut = zoomOutDist < 0.05;
-        if (isZoomOut && !lastZoomOut.current) {
+        if (isZoomOut && !lastZoomOut.current && now - lastZoomTime.current > COOLDOWNS.zoom) {
           setLastGesture("Zoom Out");
           document.body.style.zoom = `${Math.max((Number(document.body.style.zoom) || 1) - 0.1, 0.5)}`;
+          lastZoomTime.current = now;
         }
         lastZoomOut.current = isZoomOut;
       }
