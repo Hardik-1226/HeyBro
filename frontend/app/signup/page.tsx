@@ -1,6 +1,7 @@
 "use client"
 import SignUpForm from "@/components/SignUpForm"
-import StarBackground from "@/components/StarBackground" // Re-import StarBackground
+import dynamic from "next/dynamic"
+const StarBackground = dynamic(() => import("@/components/StarBackground"), { ssr: false })
 import { useInViewAnimation } from "@/hooks/useInViewAnimation"
 
 export default function SignUpPage() {
