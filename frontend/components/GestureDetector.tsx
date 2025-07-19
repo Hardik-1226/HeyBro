@@ -23,7 +23,23 @@ const COOLDOWNS = {
   zoom: 800,
 };
 
-export default function GestureDetector() {
+export function GestureToggleButton({ enabled, setEnabled }: { enabled: boolean, setEnabled: React.Dispatch<React.SetStateAction<boolean>> }) {
+  return (
+    <button
+      onClick={() => setEnabled((prev: boolean) => !prev)}
+      style={{
+        position: 'fixed', bottom: 32, right: 32, zIndex: 10001,
+        background: enabled ? '#8A2BE2' : '#444', color: '#fff', border: 'none', borderRadius: 50, width: 56, height: 56,
+        fontWeight: 'bold', fontSize: 28, boxShadow: '0 2px 12px #0008', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}
+      title={enabled ? 'Disable Gesture Control' : 'Enable Gesture Control'}
+    >
+      <span role="img" aria-label="hand">🖐️</span>
+    </button>
+  );
+}
+
+export default function GestureDetector({ enabled, showInstructions }: { enabled: boolean, showInstructions?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const lastScrollY = useRef<number | null>(null);
   const lastPinch = useRef<boolean>(false);
@@ -34,8 +50,6 @@ export default function GestureDetector() {
   const lastScrollTime = useRef<number>(0);
   const lastZoomTime = useRef<number>(0);
   const [lastGesture, setLastGesture] = useState<string>("");
-  const [enabled, setEnabled] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
   const cursorPos = useRef({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
 
   useEffect(() => {
@@ -143,46 +157,31 @@ export default function GestureDetector() {
     };
   }, [enabled]);
 
+  if (!enabled) return null;
+
   return (
     <>
-      {/* Floating control panel */}
-      <div style={{ position: 'fixed', top: 24, right: 24, zIndex: 10000, background: '#23272f', color: '#fff', borderRadius: 12, boxShadow: '0 2px 12px #0008', padding: 16, minWidth: 220 }}>
-        <button
-          onClick={() => setEnabled(e => !e)}
-          style={{ background: enabled ? '#8A2BE2' : '#444', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer', marginBottom: 8 }}
-        >
-          {enabled ? 'Stop Gesture Control' : 'Start Gesture Control'}
-        </button>
-        <button
-          onClick={() => setShowInstructions(i => !i)}
-          style={{ background: '#444', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 16px', fontWeight: 'bold', cursor: 'pointer', marginLeft: 8 }}
-        >
-          {showInstructions ? 'Hide Instructions' : 'Show Instructions'}
-        </button>
-        <div style={{ marginTop: 12, fontSize: 16, minHeight: 24 }}>
-          {enabled && lastGesture && <span>Last Gesture: <b style={{ color: '#8A2BE2' }}>{lastGesture}</b></span>}
+      <div>
+        <video ref={videoRef} style={{ display: "block", width: 640, height: 480, position: 'fixed', bottom: 24, left: 24, zIndex: 9999, borderRadius: 12, boxShadow: '0 2px 12px #0008' }} autoPlay playsInline />
+        {/* Custom cursor for gesture control */}
+        <div id="gesture-cursor" style={{
+          position: "fixed",
+          width: 20,
+          height: 20,
+          background: "#8A2BE2",
+          borderRadius: "50%",
+          pointerEvents: "none",
+          left: 0,
+          top: 0,
+          zIndex: 99999,
+          opacity: 0.8,
+          border: "2px solid white",
+        }} />
+        {/* Feedback for last gesture */}
+        <div style={{ position: 'fixed', left: 24, bottom: 120, zIndex: 10000, background: '#23272f', color: '#fff', borderRadius: 8, padding: '8px 16px', fontSize: 18, minWidth: 120, textAlign: 'center', opacity: 0.95 }}>
+          {lastGesture && <span>Last: <b style={{ color: '#8A2BE2' }}>{lastGesture}</b></span>}
         </div>
       </div>
-      {/* Video and cursor */}
-      {enabled && (
-        <div>
-          <video ref={videoRef} style={{ display: "block", width: 640, height: 480, position: 'fixed', bottom: 24, left: 24, zIndex: 9999, borderRadius: 12, boxShadow: '0 2px 12px #0008' }} autoPlay playsInline />
-          {/* Custom cursor for gesture control */}
-          <div id="gesture-cursor" style={{
-            position: "fixed",
-            width: 20,
-            height: 20,
-            background: "#8A2BE2",
-            borderRadius: "50%",
-            pointerEvents: "none",
-            left: 0,
-            top: 0,
-            zIndex: 99999,
-            opacity: 0.8,
-            border: "2px solid white",
-          }} />
-        </div>
-      )}
       {/* Instructions panel */}
       {showInstructions && (
         <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10000, background: '#222', color: '#fff', padding: 16, borderRadius: 8, maxWidth: 400 }}>
@@ -196,4 +195,10 @@ export default function GestureDetector() {
       )}
     </>
   );
-} 
+} / /  
+ t e s t :  
+ f o r c e  
+ a  
+ v i s i b l e  
+ c h a n g e  
+ 
