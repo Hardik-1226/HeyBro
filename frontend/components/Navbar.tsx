@@ -48,6 +48,14 @@ export default function Navbar() {
             Features
           </Button>
         </Link> */}
+        <Link href="/gesture-demo" passHref>
+          <Button
+            variant="ghost"
+            className="text-white hover:text-neon-blue dark:text-white dark:hover:text-neon-blue light:text-gray-800 light:hover:text-peach-500"
+          >
+            Gesture Demo
+          </Button>
+        </Link>
         <Link href="/#demo" passHref>
           <Button
             variant="ghost"
