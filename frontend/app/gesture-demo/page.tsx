@@ -1,8 +1,6 @@
 "use client";
-import dynamic from "next/dynamic";
-
-const GestureDetector = dynamic(() => import("@/components/GestureDetector"), { ssr: false });
+import GestureToggleButtonClient from "@/components/GestureDetector";
 
 export default function GestureDemoPage() {
-  return <GestureDetector />;
+  return <GestureToggleButtonClient />;
 } 
