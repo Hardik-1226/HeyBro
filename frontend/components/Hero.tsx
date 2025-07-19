@@ -11,8 +11,8 @@ export default function Hero() {
   const [message, setMessage] = useState("")
   const [activated, setActivated] = useState(false)
 
-  // Use local backend
-  const BACKEND_URL = "http://localhost:8000";
+  // Use production backend
+  const BACKEND_URL = "https://heybro-2.onrender.com";
 
   const handleGetStarted = async () => {
     setLoading(true)
